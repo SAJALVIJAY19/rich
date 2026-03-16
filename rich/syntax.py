@@ -557,14 +557,44 @@ class Syntax(JupyterMixin):
         style_before: bool = False,
     ) -> None:
         """
-        Adds a custom style on a part of the code, that will be applied to the syntax display when it's rendered.
-        Line numbers are 1-based, while column indexes are 0-based.
+        Apply a custom style to a specific range of the syntax-highlighted code.
+
+        This method allows you to add additional styling to a portion of the code
+        after it has been syntax highlighted. The style will be applied when the
+        syntax is rendered. This is useful for emphasizing specific parts of code,
+        such as search results, errors, or custom annotations.
 
         Args:
-            style (StyleType): The style to apply.
-            start (Tuple[int, int]): The start of the range, in the form `[line number, column index]`.
-            end (Tuple[int, int]): The end of the range, in the form `[line number, column index]`.
-            style_before (bool): Apply the style before any existing styles.
+            style (Union[str, Style]): Style to apply. Can be a style string
+                (e.g., "bold red", "underline on blue") or a Style instance.
+            start (Tuple[int, int]): Start position as (line_number, column_index).
+                Line numbers are 1-based (first line is 1).
+                Column indexes are 0-based (first character is column 0).
+            end (Tuple[int, int]): End position as (line_number, column_index).
+                The range is inclusive of the start position and exclusive of the
+                end position (similar to Python slicing).
+            style_before (bool): If True, apply the style before any existing styles
+                (lower precedence). If False (default), apply after existing styles
+                (higher precedence, will override existing styles).
+
+        Returns:
+            None
+
+        Example:
+            >>> from rich.syntax import Syntax
+            >>> code = Syntax('print("Hello World")\\nprint("Goodbye")', "python")
+            >>> # Style the word "Hello" (line 1, columns 7-12) in bold red
+            >>> code.stylize_range("bold red", (1, 7), (1, 12))
+            >>> # Style an entire line with a background color
+            >>> code.stylize_range("on bright_yellow", (2, 0), (2, 20))
+            >>> # Apply a style before existing syntax highlighting
+            >>> code.stylize_range("dim", (1, 0), (2, 50), style_before=True)
+
+        Note:
+            - If the column index exceeds the line length, it will be clamped to the
+            end of the line automatically.
+            - Multiple calls to stylize_range can be made, and all styles will be
+            applied in the order they were added.
         """
         self._stylized_ranges.append(
             _SyntaxHighlightRange(style, start, end, style_before)
