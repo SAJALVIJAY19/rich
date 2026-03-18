@@ -1,3 +1,8 @@
+## [Unreleased]
+### Fixed
+- Improved documentation for `stylize_range` method in Syntax class, adding comprehensive parameter descriptions and usage examples (#2842)
+
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
